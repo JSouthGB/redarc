@@ -23,7 +23,7 @@ export default function Post(props){
    return(
       <div>
          <h1>{title}</h1>
-         <h4><span class="label label-info">{type}</span>  <span class="label label-success">Anonymous</span>  <span class="label label-important">⬆ {score}</span>  <span class="label label-info">{date}</span>  <span class="label label-default">{num_comments} comments</span></h4>
+         <h4><span class="label label-info">{type}</span>  <span class="label label-success">{author}</span>  <span class="label label-important">⬆ {score}</span>  <span class="label label-info">{date}</span>  <span class="label label-default">{num_comments} comments</span></h4>
          {is_self ? <div class="well"><p style={{overflowWrap: 'break-word'}}>{self_text}</p></div> : <div class="well"><p style={{overflowWrap: 'break-word'}}><small>{url}</small></p></div>}
          <img src={thumbnail} class="img-rounded" id="thumbnail"></img>
          <a onClick={toggle}><small>Toggle thumbnail</small></a>
