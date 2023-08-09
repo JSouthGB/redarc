@@ -17,7 +17,7 @@ def validate_submission(submission):
    else:
       title = ""
 
-   if submission.author.name and isinstance(submission.author.name, str):
+   if submission.author and isinstance(submission.author.name, str):
       author = submission.author.name.strip().replace("\u0000", "").lower()
    else:
       author = "[unknown]"
@@ -94,7 +94,7 @@ def validate_submission(submission):
         "thumbnail": thumbnail,
         "score": score,
         "gilded": gilded,
-    }
+   }
 
 def validate_comment(comment):
    if comment.id and isinstance(comment.id, str):
@@ -106,9 +106,6 @@ def validate_comment(comment):
       subreddit = comment.subreddit.display_name.strip().lower()
    else:
       return None
-   print(comment.author)
-   print(comment.id)
-   print(comment.body)
    if comment.author and isinstance(comment.author.name, str):
       author = comment.author.name.strip().lower()
    else:

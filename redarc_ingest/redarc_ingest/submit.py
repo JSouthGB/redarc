@@ -3,10 +3,25 @@ import re
 from .conn import url_queue
 import falcon
 from worker.reddit_worker import fetch_thread
+import os
+
 class Submit:
 
-    def on_get(self, req, resp):
-      url = req.get_param('url')
+    def on_post(self, req, resp):
+
+      if os.getenv('INGEST_ENABLED') == 'false':
+        resp.text = json.dumps({"status": "ingest disabled", "url": url}, ensure_ascii=False)
+        resp.status = falcon.HTTP_500
+        return        
+      obj = req.get_media()
+      url = obj.get('url')
+      pw = obj.get('password')
+
+      if os.getenv('INGEST_PASSWORD'):
+        if pw != os.getenv('INGEST_PASSWORD'):
+          resp.status = falcon.HTTP_401
+          return
+
       if 'redd.it' in url:
         if re.search(r'\S+redd\.it\/\S+\/?$', url) == None:
           resp.text = json.dumps({"status": "invalid url", "url": url}, ensure_ascii=False)
@@ -32,10 +47,10 @@ class Submit:
         resp.status = falcon.HTTP_500
         return
          
-      job = url_queue.enqueue(fetch_thread, id)
+      job = url_queue.enqueue(fetch_thread, id, url)
       if job.get_status(refresh=True) == "queued":
-        resp.text = json.dumps({"status": "success", "id": id, "position": job.get_position()}, ensure_ascii=False)
+        resp.text = json.dumps({"status": "success", "id": job.id, "position": job.get_position()}, ensure_ascii=False)
         resp.status = falcon.HTTP_200
       else:
-        resp.text = json.dumps({"status": "failed", "id": id}, ensure_ascii=False)
+        resp.text = json.dumps({"status": "failed", "id": job.id}, ensure_ascii=False)
         resp.status = falcon.HTTP_500
